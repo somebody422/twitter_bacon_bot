@@ -3,16 +3,15 @@ import json
 import sys
 import re
 
+import const
+from state_machine import KevinBaconStateMachine
+
 import codecs
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 sys.stderr = codecs.getwriter('utf8')(sys.stderr)
 
 # enter your keys, and tokens obtained from your twitter app
 
-
-
-#twitter =  Twython(consumer_key, consumer_secret,
-#                    access_token, access_token_secret)
 
 """
 twitter = Twython(
@@ -56,8 +55,8 @@ def print_search_response(response):
 
 def main():
 	#query = "from:%s" % sys.argv[1]
-	query = str(sys.argv[1])
-	response = twitter.search(q = query, count = 3)
+	#query = str(sys.argv[1])
+	#response = twitter.search(q = query, count = 3)
 
 	"""
 	for item in x['statuses']:
@@ -70,9 +69,12 @@ def main():
 	#print(x)
 	#print("got %d tweets!" % response['search_metadata']['count'])
 	#print(len(response['statuses']))
-	pretty(response['statuses'][0])
+	#pretty(response['statuses'][0])
 
-	print_search_response(response)
+	#print_search_response(response)
+
+	state_machine = KevinBaconStateMachine()
+	state_machine.run()
 
 
 if __name__ == '__main__': 
