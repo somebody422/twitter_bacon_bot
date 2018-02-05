@@ -73,8 +73,12 @@ def main():
 
 	#print_search_response(response)
 
+	if len(sys.argv) != 2:
+		print("Usage: python kb.py START_USERNAME")
+		sys.exit(1)
+	name = str(sys.argv[1])
 	state_machine = KevinBaconStateMachine()
-	state_machine.run()
+	state_machine.run(name)
 
 
 if __name__ == '__main__': 

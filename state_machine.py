@@ -5,9 +5,19 @@ this class and add states/transitions in constructor
 Essentially is just a graph
 """
 
+
+"""
+BFS
+next_nodes = list of working nodes. pop off from the front
+previous = dictionary mapping node name to previous node name
+
+"""
+
+
 import const
 import time
 import twython
+from collections import deque
 
 
 # Class which will be inherited by our state machine
@@ -60,18 +70,25 @@ class StateMachine(object):
 States:
 not_connected - Unable to connect to twitter, or internet
 searching - Connected to twitter, searching through tweets
-found_result
+success - Found a path to kevin bacon
 """
 class KevinBaconStateMachine(StateMachine):
 	def __init__(self):
 		super(KevinBaconStateMachine, self).__init__()
 		self.connected = False
+		self.working_nodes = []
+		self.previous = {}
 		self.addState('not_connected', self.notConnectedState)
 		self.addState('searching', self.searchingState)
+		self.addState('success', self.successState)
 		self.addTransition('start', 'searching', self.tryToConnect)
 		self.addTransition('not_connected', 'searching', self.tryToConnect)
 		self.next_state = 'searching'
 
+
+	def run(self, start_name):
+		self.working_nodes.
+		super(KevinBaconStateMachine, self).run()
 
 	def tryToConnect(self):
 		if self.connected == True:
@@ -91,7 +108,9 @@ class KevinBaconStateMachine(StateMachine):
 			try:
 				# This actually gets a JSON response. However, we just
 				#  want to know if if fails (throws an exception).
+				print("verifying credentials..")
 				self.twitter.verify_credentials()
+				connected = True
 			except twython.exceptions.TwythonAuthError as ex:
 				if number_of_connect_attempts >= const.max_connection_attempts:
 					print("Unable to authenticate correctly!")
@@ -100,8 +119,7 @@ class KevinBaconStateMachine(StateMachine):
 				print("Unable to authenticate correctly! retrying..")
 				number_of_connect_attempts += 1
 				time.sleep(2)
-		
-		connected = True
+
 		next_state = 'searching'
 
 
@@ -117,3 +135,14 @@ class KevinBaconStateMachine(StateMachine):
 	def searchingState(self):
 		print("searching state")
 		time.sleep(1)
+
+
+
+
+	def processStatus(self, entry):
+		pass
+
+
+	def successState(self):
+		print("Success!")
+		self.next_state = 'end'
