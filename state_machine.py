@@ -17,6 +17,7 @@ previous = dictionary mapping node name to previous node name
 import const
 import time
 import twython
+import re
 from collections import deque
 
 
@@ -71,23 +72,25 @@ States:
 not_connected - Unable to connect to twitter, or internet
 searching - Connected to twitter, searching through tweets
 success - Found a path to kevin bacon
+fail - Out of nodes, unable to find a path
 """
 class KevinBaconStateMachine(StateMachine):
 	def __init__(self):
 		super(KevinBaconStateMachine, self).__init__()
 		self.connected = False
-		self.working_nodes = []
+		self.working_nodes = deque()
 		self.previous = {}
 		self.addState('not_connected', self.notConnectedState)
 		self.addState('searching', self.searchingState)
 		self.addState('success', self.successState)
+		self.addState('fail', self.failState)
 		self.addTransition('start', 'searching', self.tryToConnect)
 		self.addTransition('not_connected', 'searching', self.tryToConnect)
 		self.next_state = 'searching'
 
 
 	def run(self, start_name):
-		self.working_nodes.
+		self.working_nodes.append(start_name)
 		super(KevinBaconStateMachine, self).run()
 
 	def tryToConnect(self):
@@ -101,7 +104,7 @@ class KevinBaconStateMachine(StateMachine):
 			oauth_token_secret = const.access_token_secret
 		)
 
-		# Do a test search to see if we are connected
+		# Test if we are actually connected
 		number_of_connect_attempts = 0
 		connected = False
 		while(not connected):
@@ -111,6 +114,7 @@ class KevinBaconStateMachine(StateMachine):
 				print("verifying credentials..")
 				self.twitter.verify_credentials()
 				connected = True
+				next_state = 'searching'
 			except twython.exceptions.TwythonAuthError as ex:
 				if number_of_connect_attempts >= const.max_connection_attempts:
 					print("Unable to authenticate correctly!")
@@ -119,8 +123,6 @@ class KevinBaconStateMachine(StateMachine):
 				print("Unable to authenticate correctly! retrying..")
 				number_of_connect_attempts += 1
 				time.sleep(2)
-
-		next_state = 'searching'
 
 
 	def notConnectedState(self):
@@ -133,16 +135,72 @@ class KevinBaconStateMachine(StateMachine):
 
 
 	def searchingState(self):
-		print("searching state")
-		time.sleep(1)
+		if len(self.working_nodes) < 1:
+			self.next_state = 'fail'
+			return
+
+		node = self.working_nodes.popleft()
+		try:
+			result = self.twitter.search(
+				q = "from:" + node,
+				count = 100
+			)
+		except twython.exceptions.TwythonAuthError as ex:
+			print("Error conecting to twitter")
+			print(ex)
+			self.next_state = 'not_connected'
+			return
+
+		for status in result['statuses']:
+			if re.search(r'@kevinbacon|kevin bacon|kevin_bacon', status['text'], flags=re.IGNORECASE):
+				# Found a path to kevin bacon!!
+				self.success_node = node
+				self.success_status = status
+				self.next_state = 'success'
+				return
+
+			for mentioned_user in status['entities']['user_mentions']:
+				mentioned_user_name = mentioned_user['name']
+				if mentioned_user_name != node and mentioned_user_name not in self.previous:
+					# Add the node to the working_nodes list
+					self.previous[mentioned_user_name] = node
+					self.working_nodes.append(mentioned_user_name)
+				else:
+					print("already seen " + mentioned_user_name)
+
+		# for now just do one iteration for testing
+		self.next_state = 'success'
 
 
 
 
-	def processStatus(self, entry):
-		pass
+
+	#def processStatus(self, entry):
+	#	pass
 
 
 	def successState(self):
 		print("Success!")
+		
+		# print out path
+		path = [self.success_node]
+		temp_node = self.success_node
+		while temp_node in self.previous:
+			temp_node = self.previous[temp_node]
+			path.append(temp_node)
+
+		print("Path: " + success_node)
+		for node in reversed(path):
+			print(" -> " + node)
+
+		# for debugging, print out status of state machine..
+		print(self.working_nodes)
+		print('\n')
+		print(self.previous)
+
+		self.next_state = 'end'
+
+
+	def failState(self):
+		print("failure :(")
 		self.next_state = 'end'
