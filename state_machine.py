@@ -18,6 +18,7 @@ import const
 import time
 import twython
 import re
+from sys import stdout
 from collections import deque
 
 
@@ -151,6 +152,8 @@ class KevinBaconStateMachine(StateMachine):
 			self.next_state = 'not_connected'
 			return
 
+		print("Looking at \'" + node + "\'")
+
 		for status in result['statuses']:
 			if re.search(r'@kevinbacon|kevin bacon|kevin_bacon', status['text'], flags=re.IGNORECASE):
 				# Found a path to kevin bacon!!
@@ -163,13 +166,23 @@ class KevinBaconStateMachine(StateMachine):
 				mentioned_user_name = mentioned_user['name']
 				if mentioned_user_name != node and mentioned_user_name not in self.previous:
 					# Add the node to the working_nodes list
+					print("Adding to queue: " + mentioned_user_name)
 					self.previous[mentioned_user_name] = node
 					self.working_nodes.append(mentioned_user_name)
 				else:
 					print("already seen " + mentioned_user_name)
 
+		
+		print(self.working_nodes)
+		print(self.previous)
+		print('\n')
+		time.sleep(1)
+
+
+
 		# for now just do one iteration for testing
-		self.next_state = 'success'
+		#self.next_state = 'success'
+		#self.next_state = 'fail'
 
 
 
@@ -183,15 +196,16 @@ class KevinBaconStateMachine(StateMachine):
 		print("Success!")
 		
 		# print out path
-		path = [self.success_node]
+		path = ['kevinbacon', self.success_node]
 		temp_node = self.success_node
 		while temp_node in self.previous:
 			temp_node = self.previous[temp_node]
 			path.append(temp_node)
 
-		print("Path: " + success_node)
+		#stdout.write("Path: " + path.pop(0))
 		for node in reversed(path):
-			print(" -> " + node)
+			stdout.write(" -> " + node)
+		print('\n')
 
 		# for debugging, print out status of state machine..
 		print(self.working_nodes)
@@ -203,4 +217,8 @@ class KevinBaconStateMachine(StateMachine):
 
 	def failState(self):
 		print("failure :(")
+		# for debugging, print out status of state machine..
+		print(self.working_nodes)
+		print('\n')
+		print(self.previous)
 		self.next_state = 'end'
