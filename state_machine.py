@@ -75,6 +75,10 @@ searching - Connected to twitter, searching through tweets
 data_capped - Reached data cap. Periodically tries to make requests
 success - Found a path to kevin bacon
 fail - Out of nodes, unable to find a path
+
+A few notes on the searching algorithm and twitter API:
+ * API will not return old tweets like the browser search does. Have
+    not been able to find a way around this :(
 """
 class KevinBaconStateMachine(StateMachine):
 	def __init__(self, start_node):
@@ -150,6 +154,7 @@ class KevinBaconStateMachine(StateMachine):
 			result = self.twitter.search(
 				q = "from:" + node,
 				result_type = 'recent',
+				# 100 is the max allowed by the API
 				count = 100,
 				tweet_mode = 'extended'
 			)
@@ -166,14 +171,14 @@ class KevinBaconStateMachine(StateMachine):
 		print("Looking at \'" + node + "\'")
 		print(str(len(result['statuses'])) + ' tweets')
 		for status in result['statuses']:
-			print('\n')
+			#print('\n')
 			if re.search(r'@kevinbacon|kevin bacon|kevin_bacon', status['full_text'], flags=re.IGNORECASE):
 				# Found a path to kevin bacon!!
 				self.success_node = node
 				self.success_status = status
 				self.next_state = 'success'
 				return
-			print(status['full_text'])
+			#print(status['full_text'])
 			for mentioned_user in status['entities']['user_mentions']:
 				mentioned_user_name = mentioned_user['screen_name']
 				if mentioned_user_name != node and mentioned_user_name not in self.previous:
@@ -183,6 +188,7 @@ class KevinBaconStateMachine(StateMachine):
 					self.working_nodes.append(mentioned_user_name)
 
 
+		print self.working_nodes
 		if const.max_iterations != -1:
 			if self.num_iterations >= const.max_iterations:
 				self.next_state = 'fail'
