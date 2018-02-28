@@ -1,0 +1,6 @@
+* better way to do the codecs thing? Try commenting that out, will logging work?
+
+
+* Try to run a few instances at the same time. Did everything break?
+
+* Verify that the starting username is an actual user! if not, print some specific error message.

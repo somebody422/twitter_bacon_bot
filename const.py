@@ -16,3 +16,10 @@ secs_between_tries_while_data_capped = 10
 
 # Should be something very high, or -1 for no max
 max_iterations = -1
+
+# Default level of verbosity. Affects printing things and
+#  logging things
+# 0: Print and log nothing
+# 1: Print nothing, log everything
+# 2: Pirnt everthing, log everything
+default_verbosity_level = 1
