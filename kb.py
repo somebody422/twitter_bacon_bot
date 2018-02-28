@@ -4,6 +4,7 @@ import json
 import sys
 
 from state_machine import KevinBaconStateMachine
+from logger import Logger
 import const
 
 import codecs
@@ -41,6 +42,9 @@ def main():
 	args = parser.parse_args()
 	print(args)
 	print(args.username)
+
+	logger.init()
+
 
 
 if __name__ == '__main__': 
