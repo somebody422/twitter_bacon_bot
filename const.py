@@ -23,4 +23,4 @@ max_iterations = -1
 # 0: Print minimum and log nothing
 # 1: Print minimum, log everything
 # 2: Print everthing, log everything
-default_verbosity_level = 2
+default_verbosity_level = 1
