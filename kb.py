@@ -7,9 +7,6 @@ from state_machine import KevinBaconStateMachine
 from logger import Logger
 import const
 
-import codecs
-sys.stdout = codecs.getwriter('utf8')(sys.stdout)
-sys.stderr = codecs.getwriter('utf8')(sys.stderr)
 
 """
 Creates and returns an argparse object
