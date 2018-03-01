@@ -30,21 +30,16 @@ def makeArgParser():
 
 def main():
 
-	"""
-	if len(sys.argv) != 2:
-		print("Usage: python kb.py START_USERNAME")
-		sys.exit(1)
-	name = str(sys.argv[1])
-	state_machine = KevinBaconStateMachine(name)
-	state_machine.run()
-	"""
+
 	parser = makeArgParser()
 	args = parser.parse_args()
-	print(args)
-	print(args.username)
 
-	logger.init()
+	Logger.init(args.verbosity, args.username[0])
+	logger = Logger.instance()
+	logger.log("Starting state machine on user %s" % args.username[0])
 
+	state_machine = KevinBaconStateMachine(args.username[0])
+	state_machine.run()
 
 
 if __name__ == '__main__': 

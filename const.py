@@ -12,7 +12,8 @@ access_token = "959179660037935104-c6Bl7XEKycJFUWdj3GBaa79x4jbpyN2"
 access_token_secret = "MpYDQLjxUGyc7w0BL8l8K7sZNkfWJ3HALbid48GO8jlTB"
 # Number of seconds between attempts to get data, when data
 #  capped and waiting
-secs_between_tries_while_data_capped = 10
+#secs_between_tries_while_data_capped = 10
+secs_between_tries_while_not_connected = 10
 
 # Should be something very high, or -1 for no max
 max_iterations = -1
@@ -21,5 +22,5 @@ max_iterations = -1
 #  logging things
 # 0: Print and log nothing
 # 1: Print nothing, log everything
-# 2: Pirnt everthing, log everything
-default_verbosity_level = 1
+# 2: Print everthing, log everything
+default_verbosity_level = 2
